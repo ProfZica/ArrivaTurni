@@ -296,7 +296,7 @@ const REF=Date.UTC(2026,9,12); // lunedì 12 ottobre 2026, settimana 0
 const DAYS=['LUN','MAR','MER','GIO','VEN','SAB','DOM'];
 const DAYS_L=['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const DEFAULT_SLOTS={Su0070:{h:'05:20 - 12:55',l:'Linea 286 • Turno 507 di Susa'}};
+const DEFAULT_SLOTS={};
 const ALL_CODES=[...CYCLE.filter(c=>c!=='DISP'),'Su0030'];
 
 const store={get(k,d){try{const v=localStorage.getItem('turniSusa.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
@@ -457,7 +457,7 @@ document.getElementById('gMine').onclick=()=>{const th=document.querySelector('#
 // ---------- orari
 let saveTimer;
 function renderSet(){
- document.getElementById('slotRows').innerHTML=ALL_CODES.map(c=>`<div class="srow"><span class="code">${c}</span><input id="h_${c}" data-c="${c}" data-k="h" placeholder="es. 05:20 - 12:55" value="${esc((slots[c]||{}).h||'')}"><input id="l_${c}" data-c="${c}" data-k="l" placeholder="es. Linea 286" value="${esc((slots[c]||{}).l||'')}"></div>`).join('');
+ document.getElementById('slotRows').innerHTML=ALL_CODES.map(c=>`<div class="srow"><span class="code">${c}</span><input id="h_${c}" data-c="${c}" data-k="h" placeholder="es. 06:00 - 13:30" value="${esc((slots[c]||{}).h||'')}"><input id="l_${c}" data-c="${c}" data-k="l" placeholder="es. linea e note" value="${esc((slots[c]||{}).l||'')}"></div>`).join('');
  document.getElementById('holOpt').checked=holOn;
  const y0=new Date().getFullYear();
  document.getElementById('sumOpt').checked=sumOn;
