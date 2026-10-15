@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#004d73">
+<title>ArrivaTurni</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: app a una colonna stile "desk", griglia di rotazione con prima colonna e intestazione fisse */
+:root{
+  --bg:#f1f5f7; --surface:#ffffff; --surface-2:#f5f9fa; --line:#dce6ea; --fg:#0f2a38; --muted:#5d7380;
+  --accent:#007c85; --accent-soft:#e1f4f5; --accent-line:#8ed4d9;
+  --blue:#004d73; --blue-soft:#dbebfa; --sun:#c8323a; --sat:#007fdb;
+  --rip:#007fdb; --disp:#c47406; --ok:#11862f; --ok-soft:#ddf2e2; --hol:#832561;
+  --brand:#004d73; --brand-mark:#3cc6cf;
+  --shadow:0 1px 2px rgba(20,30,60,.05),0 6px 18px rgba(20,30,60,.06);
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1820; --surface:#13232d; --surface-2:#182b36; --line:#24404d; --fg:#e8f1f4; --muted:#93aab5;
+  --accent:#3cc6cf; --accent-soft:#103a3e; --accent-line:#1f6b71;
+  --blue:#7cc0ee; --blue-soft:#14304a; --sun:#f07a7f; --sat:#6fb6f0;
+  --rip:#6fb6f0; --disp:#f0ae4a; --ok:#5fcf7d; --ok-soft:#15331f; --hol:#e07ab8;
+  --brand:#00334e; --brand-mark:#3cc6cf;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1820; --surface:#13232d; --surface-2:#182b36; --line:#24404d; --fg:#e8f1f4; --muted:#93aab5;
+  --accent:#3cc6cf; --accent-soft:#103a3e; --accent-line:#1f6b71;
+  --blue:#7cc0ee; --blue-soft:#14304a; --sun:#f07a7f; --sat:#6fb6f0;
+  --rip:#6fb6f0; --disp:#f0ae4a; --ok:#5fcf7d; --ok-soft:#15331f; --hol:#e07ab8;
+  --brand:#00334e; --brand-mark:#3cc6cf;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}
+
+html,body{height:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap>section{min-width:0;width:100%}
+.wrap{max-width:1100px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;background:var(--brand);display:grid;place-items:center;flex:none}
+.logo svg{width:26px;height:26px}
+.brand{font-family:var(--f-display);font-weight:800;font-size:1.45rem;letter-spacing:-.02em;line-height:1}
+.brand b{color:var(--accent);font-weight:800}
+.brand{color:var(--blue)}
+.brand small{display:block;font-family:var(--f-body);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:4px}
+.top .sp{flex:1}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.icon-btn svg{width:20px;height:20px}
+
+/* driver picker */
+.who{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:14px;padding:4px 12px}
+.who svg{width:20px;height:20px;color:var(--accent);flex:none}
+.who select{flex:1;min-width:0;background:transparent;border:0;padding:10px 0;font-weight:700;font-size:1.05rem;appearance:none;-webkit-appearance:none}
+.who .dep{color:var(--muted);font-size:.9rem;white-space:nowrap}
+
+/* date strip */
+.datebar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-weight:600}
+.datebar .clock{color:var(--accent);font-family:var(--f-mono);font-weight:700}
+
+/* today card */
+.today{background:linear-gradient(135deg,var(--surface) 0%,var(--accent-soft) 140%);border:1.5px solid var(--accent-line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.eyebrow{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{font-size:.7rem;letter-spacing:.08em;padding:4px 10px;border-radius:99px;font-weight:700;white-space:nowrap}
+.pill.work{background:var(--ok-soft);color:var(--ok)}
+.pill.rest{background:var(--blue-soft);color:var(--rip)}
+.pill.disp{background:var(--accent-soft);color:var(--disp);border:1px solid var(--accent-line)}
+.today h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:2rem;letter-spacing:-.02em;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.today h2 .hrs{font-family:var(--f-mono);font-size:1.05rem;color:var(--accent);font-weight:700}
+.today .meta{color:var(--muted);font-size:.92rem}
+.next{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.next .mini{min-width:0}
+@media (max-width:480px){.mini{padding:10px}.mini .l{font-size:.62rem;letter-spacing:.06em}.mini .v{font-size:.98rem}.mini .s{font-size:.74rem}}
+.mini{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.mini .l{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.mini .v{font-family:var(--f-mono);font-weight:700;font-size:1.1rem;margin-top:4px}
+.mini .s{font-size:.82rem;color:var(--muted)}
+
+/* nav tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;font-weight:700;font-size:1rem;box-shadow:var(--shadow);text-align:center}
+.tile .ic{width:48px;height:48px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center}
+.tile .ic svg{width:24px;height:24px}
+.tile:hover{border-color:var(--accent-line)}
+
+/* view header */
+.vhead{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;box-shadow:var(--shadow)}
+.back{display:flex;align-items:center;gap:6px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent);font-weight:700;border-radius:10px;padding:8px 12px}
+.back svg{width:18px;height:18px}
+.vhead h1{margin:0;font-size:1.05rem;font-weight:700;flex:1;text-align:center;padding-right:8px}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.month{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.month button{border:0;background:transparent;width:36px;height:36px;border-radius:8px;display:grid;place-items:center}
+.month button:hover{background:var(--surface-2)}
+.month button svg{width:18px;height:18px}
+.month span{min-width:140px;text-align:center;font-weight:700}
+.search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.search svg{width:18px;height:18px;color:var(--accent);flex:none}
+.search input{border:0;background:transparent;padding:10px 0;width:100%;min-width:0}
+.chip{border-radius:10px;padding:9px 14px;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid}
+.chip svg{width:16px;height:16px}
+.chip.mine{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+.chip.now{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+
+/* grid */
+.gridbox{min-width:0;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:auto;max-height:72vh;position:relative}
+table.rot{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;width:max-content;min-width:100%}
+.rot th,.rot td{padding:0 10px;height:44px;text-align:center;border-bottom:1px solid var(--line);border-right:1px solid var(--line);white-space:nowrap;background:var(--surface)}
+.rot thead th{position:sticky;top:0;z-index:3;height:54px;border-bottom:2px solid var(--accent);font-weight:700;line-height:1.15;min-width:96px}
+.rot thead th small{display:block;color:var(--muted);font-weight:500;font-size:.75rem;font-family:var(--f-mono)}
+.rot th.dcol,.rot td.dcol{position:sticky;left:0;z-index:2;text-align:left;font-weight:700;min-width:84px;padding-left:14px}
+.rot thead th.dcol{z-index:4}
+.rot td{font-family:var(--f-mono);font-size:.9rem;font-weight:500}
+.rot td.dcol{font-family:var(--f-body);font-size:.92rem}
+.rot .sat{color:var(--sat)} .rot .sun{color:var(--sun)} .rot .hol{color:var(--hol)}
+.sum-tag{display:inline-block;font-size:.62rem;letter-spacing:.06em;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);border-radius:4px;padding:0 4px;margin-left:4px;vertical-align:2px;font-family:var(--f-body)}
+.hol-tag{display:inline-block;font-size:.62rem;letter-spacing:.06em;background:var(--hol);color:var(--surface);border-radius:4px;padding:1px 4px;margin-left:4px;vertical-align:2px;font-family:var(--f-body)}
+.rot .RIP{color:var(--rip);font-family:var(--f-body);font-weight:600}
+.rot .RF{color:var(--disp);font-family:var(--f-body);font-weight:600}
+.day.RF .c{color:var(--disp)}
+.rot .DISP{color:var(--disp);font-family:var(--f-body);font-weight:600}
+.rot .me{background:var(--accent-soft);font-weight:700}
+.rot thead th.me{color:var(--accent)}
+.rot tr.row-today td,.rot tr.row-today td.dcol{background:var(--blue-soft)}
+.rot tr.row-today td{border-bottom:2px solid var(--blue)}
+.rot tr.row-today td.dcol{color:var(--blue)}
+.tag-today{font-size:.62rem;background:var(--blue);color:var(--surface);border-radius:5px;padding:2px 5px;margin-left:6px;vertical-align:2px;letter-spacing:.05em}
+.rot tr td.hit{outline:2px solid var(--accent);outline-offset:-3px;background:var(--accent-soft)}
+.rot tr.weekstart td{border-top:2px solid var(--line)}
+
+/* my rotation */
+.weeks{display:flex;flex-direction:column;gap:12px}
+.wk{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.wk.cur{border-color:var(--accent-line);box-shadow:var(--shadow)}
+.wk-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.wk-h .t{font-family:var(--f-display);font-weight:800;font-size:1.25rem}
+.wk-h .d{color:var(--muted);font-size:.88rem}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{border:1px solid var(--line);border-radius:10px;padding:6px 2px;text-align:center;background:var(--surface-2);min-width:0}
+.day .n{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.day .c{font-family:var(--f-mono);font-size:.78rem;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis}
+.day.RIP .c{color:var(--rip)} .day.DISP .c{color:var(--disp)}
+.day.is-today{border-color:var(--blue);background:var(--blue-soft)}
+.day.sun .n{color:var(--sun)} .day.sat .n{color:var(--sat)} .day.hol .n{color:var(--hol)}
+
+/* settings */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h3{margin:0;font-size:1rem}
+.card p{margin:0;color:var(--muted);font-size:.9rem;max-width:65ch}
+.srow{display:grid;grid-template-columns:90px 1fr 1fr;gap:8px;align-items:center}
+.srow .code{font-family:var(--f-mono);font-weight:700}
+.srow input{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px 10px;min-width:0;width:100%}
+.shead{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.toggle{display:flex;gap:10px;align-items:flex-start}
+.toggle input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.85rem;color:var(--muted)}
+.legend b{font-family:var(--f-mono)}
+.note{font-size:.85rem;color:var(--muted)}
+.sumlist{display:flex;flex-direction:column;gap:8px}
+.sumrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.sumrow .y{font-family:var(--f-mono);font-weight:700;min-width:44px}
+.sumrow .p{flex:1;min-width:0}
+.prov{font-size:.72rem;font-weight:700;color:var(--disp)}
+.conf{font-size:.72rem;font-weight:700;color:var(--ok)}
+.saved{color:var(--ok);font-weight:600;font-size:.88rem}
+@media (max-width:480px){.today h2{font-size:1.7rem}.srow{grid-template-columns:72px 1fr 1fr}.month span{min-width:110px}}
+@media (prefers-reduced-motion:no-preference){.tile,.chip{transition:border-color .15s}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#3cc6cf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="3"/><path d="M3 11h18M7 17v2M17 17v2"/><circle cx="7.5" cy="14" r=".6" fill="#3cc6cf"/><circle cx="16.5" cy="14" r=".6" fill="#3cc6cf"/></svg></div>
+    <div class="brand">Arriva<b>Turni</b><small>Deposito di Susa</small></div>
+    <div class="sp"></div>
+    <button class="icon-btn" id="themeBtn" aria-label="Cambia tema chiaro o scuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  </header>
+
+  <!-- HOME -->
+  <section id="v-home" class="wrap" style="padding:0">
+    <label class="who" for="driverSel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+      <select id="driverSel" aria-label="Scegli autista"></select>
+      <span class="dep">· Susa</span>
+    </label>
+    <div class="datebar"><span id="todayLbl"></span><span class="clock" id="clock"></span></div>
+    <div class="today" id="todayCard"></div>
+    <div class="next" id="nextCards"></div>
+    <div class="tiles">
+      <button class="tile" data-go="mine"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>Mia rotazione</button>
+      <button class="tile" data-go="grid"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2.2.6 3.5 2.4 3.5 5.2"/></svg></span>Rotazione deposito</button>
+      <button class="tile" data-go="set"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Orari dei turni</button>
+      <button class="tile" data-go="info"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg></span>Come funziona</button>
+    </div>
+  </section>
+
+  <!-- MIA ROTAZIONE -->
+  <section id="v-mine" class="wrap" style="padding:0" hidden>
+    <div class="vhead"><button class="back" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Desk</button><h1 id="mineTitle">Mia rotazione</h1></div>
+    <div class="controls">
+      <div class="month"><button id="mPrev" aria-label="Settimane precedenti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button><span id="mLbl"></span><button id="mNext" aria-label="Settimane successive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div>
+      <button class="chip now" id="mToday"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Oggi</button>
+    </div>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <!-- ROTAZIONE DEPOSITO -->
+  <section id="v-grid" class="wrap" style="padding:0" hidden>
+    <div class="vhead"><button class="back" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Desk</button><h1>Rotazione deposito</h1></div>
+    <div class="controls">
+      <div class="month"><button id="gPrev" aria-label="Mese precedente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button><span id="gLbl"></span><button id="gNext" aria-label="Mese successivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div>
+      <label class="search" for="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Evidenzia turno o autista (es. 0070, Favro, 976)"></label>
+      <button class="chip mine" id="gMine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>La mia colonna</button>
+      <button class="chip now" id="gToday"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Oggi</button>
+    </div>
+    <div class="gridbox" id="gridbox"><table class="rot" id="rot"></table></div>
+    <div class="legend"><span><b style="color:var(--rip)">RIP</b> riposo</span><span><b style="color:var(--disp)">DISP</b> disponibilità</span><span><b style="color:var(--disp)">RF</b> riposo festivo</span><span><b style="color:var(--hol)">FEST</b> festività nazionale</span><span><b style="color:var(--accent)">EST</b> calendario estivo</span><span><b style="color:var(--accent)">EST?</b> estivo, date ancora provvisorie</span></div>
+  </section>
+
+  <!-- ORARI -->
+  <section id="v-set" class="wrap" style="padding:0" hidden>
+    <div class="vhead"><button class="back" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Desk</button><h1>Orari dei turni</h1></div>
+    <div class="card">
+      <h3>Orario e linea di ogni turno</h3>
+      <p>Compila orario e descrizione una volta sola. Compariranno nella scheda "Il mio turno oggi". I dati restano salvati su questo telefono.</p>
+      <div class="srow"><span class="shead">Turno</span><span class="shead">Orario</span><span class="shead">Linea / note</span></div>
+      <div id="slotRows" style="display:flex;flex-direction:column;gap:8px"></div>
+      <span class="saved" id="savedMsg" hidden>Salvato</span>
+    </div>
+    <div class="card">
+      <h3>Calendario estivo</h3>
+      <label class="toggle" for="sumOpt"><input type="checkbox" id="sumOpt"><span>Attivo in automatico quando le scuole sono chiuse. In quei giorni il Su0110 diventa DISP. Tutti gli altri turni restano uguali.</span></label>
+      <div id="sumList" class="sumlist"></div>
+      <p class="note">Le date seguono il calendario scolastico del Piemonte. Quelle provvisorie vengono aggiornate quando la Regione pubblica il calendario dell'anno.</p>
+    </div>
+    <div class="card">
+      <h3>Festività</h3>
+      <label class="toggle" for="holOpt"><input type="checkbox" id="holOpt"><span>Nei festivi infrasettimanali lavorano solo Su5010 e Su0020, Su0040 e Su0110 sono DISP, tutti gli altri sono in riposo festivo (RF). Di sabato festivo chi riposa resta RIP e tutti gli altri sono RF.</span></label>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="v-info" class="wrap" style="padding:0" hidden>
+    <div class="vhead"><button class="back" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Desk</button><h1>Come funziona</h1></div>
+    <div class="card">
+      <h3>Il giro è di 11 settimane</h3>
+      <p>Ogni lunedì ciascun autista prende il turno che la settimana prima aveva il collega alla sua destra nella tabella. Dopo 11 settimane si torna al punto di partenza, e il giro continua uguale anche a cavallo dell'anno.</p>
+      <p>Ordine dei turni nel giro: <b style="font-family:var(--f-mono)">Su0090 → Su0010 → Su0080 → Su0040 → Su0060 → Su0070 → Su0110 → Su5010 → Su0100 → Su0020 → DISP</b>, poi di nuovo Su0090.</p>
+    </div>
+    <div class="card">
+      <h3>Sabato e domenica</h3>
+      <p><b>Su0090, Su0010, Su0080, Su0060, Su0070, Su5010, Su0100</b>: lavorano dal lunedì al sabato, domenica riposo.</p>
+      <p><b>Su0040 e Su0110</b>: lunedì a venerdì, sabato riposo, domenica DISP.</p>
+      <p><b>Su0020</b>: lunedì a venerdì, sabato riposo, domenica Su0020.</p>
+      <p><b>DISP</b>: lunedì a venerdì disponibilità, sabato Su0030, domenica riposo.</p>
+    </div>
+    <div class="card">
+      <h3>Festivi infrasettimanali</h3>
+      <p>Quando una festa nazionale cade dal lunedì al venerdì lavorano solo <b>Su5010</b> e <b>Su0020</b>. Chi ha <b>Su0040</b> o <b>Su0110</b> è DISP, tutti gli altri sono in riposo festivo (RF).</p>
+      <p>Se la festa cade di <b>sabato</b>, chi quel sabato era già di riposo resta RIP, tutti gli altri sono RF. In tabella quei giorni hanno l'etichetta FEST.</p>
+    </div>
+    <div class="card">
+      <h3>Estate</h3>
+      <p>Quando chiudono le scuole, più o meno dal 10 giugno al 10 settembre, il Su0110 diventa DISP. Tutti gli altri turni restano uguali. I giorni di riposo restano gli stessi, e anche tutti gli altri turni. Le date seguono il calendario scolastico del Piemonte: finché la Regione non lo pubblica sono provvisorie, e in tabella compare "EST?".</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+const DRIVERS=[
+ {n:'Aschieris',m:'945'},{n:'Conca Piero',m:'937'},{n:'Di Silvestro',m:'955'},{n:'Favretto',m:'968'},
+ {n:'Piazzolla',m:'1301'},{n:'Migliasso',m:'976'},{n:'Tescaro',m:'1039'},{n:'Blesic',m:'702000022'},
+ {n:'Cassese',m:'984'},{n:'Favro',m:'1024'},{n:'Tomassone',m:'947'}];
+const CYCLE=['Su0090','Su0010','Su0080','Su0040','Su0060','Su0070','Su0110','Su5010','Su0100','Su0020','DISP'];
+const REF=Date.UTC(2026,9,12); // lunedì 12 ottobre 2026, settimana 0
+const DAYS=['LUN','MAR','MER','GIO','VEN','SAB','DOM'];
+const DAYS_L=['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
+const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const DEFAULT_SLOTS={Su0070:{h:'05:20 - 12:55',l:'Linea 286 • Turno 507 di Susa'}};
+const ALL_CODES=[...CYCLE.filter(c=>c!=='DISP'),'Su0030'];
+
+const store={get(k,d){try{const v=localStorage.getItem('turniSusa.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+ set(k,v){try{localStorage.setItem('turniSusa.'+k,JSON.stringify(v))}catch(e){}}};
+let me=store.get('me',5);
+let slots=Object.assign({},DEFAULT_SLOTS,store.get('slots',{}));
+let holOn=store.get('holOn2',true);
+let sumOn=store.get('sumOn',true);
+// Estate = scuole chiuse in Piemonte. Primo giorno senza lezioni -> giorno prima della riapertura.
+// ok:true = data presa dal calendario scolastico regionale; false = data provvisoria.
+// Da aggiornare ogni anno quando la Regione pubblica il calendario.
+const SUMMERS={
+ 2026:{from:'06-11',fromOk:false,to:'09-13',toOk:true},  // riapertura 14/09/2026
+ 2027:{from:'06-11',fromOk:true, to:'09-12',toOk:false}   // fine lezioni 10/06/2027, riapertura prevista lun 13/09/2027
+};
+const SUMMER_DEFAULT={from:'06-11',fromOk:false,to:'09-10',toOk:false};
+function summerOf(y){return SUMMERS[y]||SUMMER_DEFAULT}
+
+
+const isRest=c=>c==='RIP'||c==='RF';
+const mod=(a,n)=>((a%n)+n)%n;
+const utc=(y,m,d)=>Date.UTC(y,m,d);
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return utc(y,mo-1,da)}
+const holCache={};
+function holidays(y){if(holCache[y])return holCache[y];const s={};
+ [[0,1,'Capodanno'],[0,6,'Epifania'],[3,25,'Liberazione'],[4,1,'Festa del Lavoro'],[5,2,'Festa della Repubblica'],[7,15,'Ferragosto'],[10,1,'Ognissanti'],[11,8,'Immacolata'],[11,25,'Natale'],[11,26,'Santo Stefano']].forEach(([m,d,n])=>s[utc(y,m,d)]=n);
+ s[easter(y)+864e5]='Pasquetta';return holCache[y]=s}
+function holName(t){return holidays(new Date(t).getUTCFullYear())[t]||null}
+
+function mdOf(t){return new Date(t).toISOString().slice(5,10)}
+function isSummer(t){if(!sumOn)return false;const md=mdOf(t),p=summerOf(new Date(t).getUTCFullYear());return md>=p.from&&md<=p.to}
+function summerSure(t){const p=summerOf(new Date(t).getUTCFullYear());return p.fromOk&&p.toOk}
+function art(w,md){const d=+md.split('-')[1];return (d===8||d===11)?w.slice(0,-1)+"ll'":w+' '}
+function fmtMD(md){const [m,d]=md.split('-').map(Number);return d+' '+MONTHS[m-1].toLowerCase()}
+// turno di un autista in un giorno (t = mezzanotte UTC)
+function slotOfWeek(i,t){const days=Math.round((t-REF)/864e5);return CYCLE[mod(i+Math.floor(days/7),11)]}
+function cell(i,t){
+ const c=baseCell(i,t);
+ // estate: il Su0110 diventa DISP, tutto il resto invariato (come SmartTurno)
+ if(isSummer(t)&&c==='Su0110')return 'DISP';
+ return c;
+}
+function baseCell(i,t){
+ const days=Math.round((t-REF)/864e5);let dow=mod(days,7);
+ const s=CYCLE[mod(i+Math.floor(days/7),11)];
+ // festivo infrasettimanale (lun-ven): lavorano solo Su5010 e Su0020, Su0040 e Su0110 sono DISP, gli altri riposano
+ // sabato festivo (come SmartTurno): chi il sabato riposa resta RIP, tutti gli altri RF
+ if(holOn&&holName(t)&&dow===5){
+  if(s==='Su0040'||s==='Su0110'||s==='Su0020')return 'RIP';
+  return 'RF';
+ }
+ if(holOn&&holName(t)&&dow<5){
+  if(s==='Su5010'||s==='Su0020')return s;
+  if(s==='Su0040'||s==='Su0110')return 'DISP';
+  return 'RF';
+ }
+ if(s==='DISP')return dow<5?'DISP':dow===5?'Su0030':'RIP';
+ if(s==='Su0040'||s==='Su0110')return dow<5?s:dow===5?'RIP':'DISP';
+ if(s==='Su0020')return dow<5||dow===6?s:'RIP';
+ return dow<6?s:'RIP';
+}
+function todayT(){const n=new Date();return utc(n.getFullYear(),n.getMonth(),n.getDate())}
+const dowOf=t=>mod(Math.round((t-REF)/864e5),7);
+function fmtD(t){const d=new Date(t);return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()].slice(0,3).toLowerCase()}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------- navigazione
+const views=['home','mine','grid','set','info'];
+function go(v){views.forEach(x=>document.getElementById('v-'+x).hidden=x!==v);
+ if(v==='home')renderHome();if(v==='mine')renderMine();if(v==='grid'){renderGrid();setTimeout(scrollToday,30)}if(v==='set')renderSet();
+ window.scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+
+// ---------- tema
+document.getElementById('themeBtn').onclick=()=>{const r=document.documentElement;
+ const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+ r.dataset.theme=dark?'light':'dark'};
+
+// ---------- home
+const sel=document.getElementById('driverSel');
+sel.innerHTML=DRIVERS.map((d,i)=>`<option value="${i}">${esc(d.n)} ${d.m}</option>`).join('');
+sel.value=me;sel.onchange=()=>{me=+sel.value;store.set('me',me);renderHome()};
+function kindPill(c){return c==='RF'?'<span class="pill rest">RIPOSO FESTIVO</span>':c==='RIP'?'<span class="pill rest">RIPOSO</span>':c==='DISP'?'<span class="pill disp">DISPONIBILITÀ</span>':'<span class="pill work">IN SERVIZIO</span>'}
+function renderHome(){
+ const t=todayT(),d=new Date(t);
+ document.getElementById('todayLbl').textContent=DAYS_L[dowOf(t)]+', '+d.getUTCDate()+' '+MONTHS[d.getUTCMonth()];
+ const c=cell(me,t),info=slots[c]||{},hol=holName(t);
+ const est=isSummer(t)?(summerSure(t)?'Calendario estivo':'Calendario estivo (date provvisorie)'):'';
+ const title=c==='RF'?'Riposo festivo':c==='RIP'?'Riposo':c==='DISP'?'Disponibilità':'Turno '+c;
+ document.getElementById('todayCard').innerHTML=`
+  <div class="eyebrow"><span>Il mio turno oggi</span>${kindPill(c)}</div>
+  <h2>${title}${info.h?`<span class="hrs">${esc(info.h)}</span>`:''}</h2>
+  <div class="meta">${[info.l?esc(info.l):(isRest(c)||c==='DISP'?'Settimana '+slotOfWeek(me,t):(info.h?'':'Orario non inserito, aggiungilo in "Orari dei turni"')),hol,est].filter(Boolean).join(' · ')}</div>`;
+ // domani, prossimo riposo, settimana prossima
+ const tm=t+864e5,ctm=cell(me,tm);
+ let r=t+864e5;for(let k=0;k<14&&!isRest(cell(me,r));k++)r+=864e5;
+ const nextMon=t+(7-dowOf(t))*864e5;
+ document.getElementById('nextCards').innerHTML=`
+  <div class="mini"><div class="l">Domani</div><div class="v">${ctm}</div><div class="s">${(slots[ctm]&&slots[ctm].h)||DAYS_L[dowOf(tm)]}</div></div>
+  <div class="mini"><div class="l">Prossimo riposo</div><div class="v">${DAYS[dowOf(r)]} ${new Date(r).getUTCDate()}</div><div class="s">${fmtD(r)}</div></div>
+  <div class="mini"><div class="l">Settimana prossima</div><div class="v">${slotOfWeek(me,nextMon)}</div><div class="s">dal ${fmtD(nextMon)}</div></div>`;
+}
+function tick(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')}
+tick();let lastDay=todayT();
+setInterval(()=>{tick();const t=todayT(),changed=t!==lastDay;lastDay=t;
+ if(!document.getElementById('v-home').hidden)renderHome();
+ else if(changed&&!document.getElementById('v-grid').hidden)renderGrid();
+ else if(changed&&!document.getElementById('v-mine').hidden)renderMine()},30000);
+
+// ---------- mia rotazione
+let mStart=null;
+function mondayOf(t){return t-dowOf(t)*864e5}
+function renderMine(){
+ if(mStart==null)mStart=mondayOf(todayT());
+ const t0=todayT();
+ document.getElementById('mineTitle').textContent=DRIVERS[me].n;
+ const end=mStart+7*8*864e5-864e5;
+ document.getElementById('mLbl').textContent=fmtD(mStart)+' – '+fmtD(end);
+ let h='';
+ for(let w=0;w<8;w++){const mon=mStart+w*7*864e5,s=slotOfWeek(me,mon),cur=mon===mondayOf(t0);
+  let days='';for(let k=0;k<7;k++){const t=mon+k*864e5,c=cell(me,t),hol=holName(t);
+   days+=`<div class="day ${isRest(c)||c==='DISP'?c:''} ${k===5?'sat':''} ${k===6?'sun':''} ${hol?'hol':''} ${t===t0?'is-today':''}" title="${hol||''}"><div class="n">${DAYS[k]} ${new Date(t).getUTCDate()}</div><div class="c">${c==='DISP'||isRest(c)?c:c.replace('Su','')}</div></div>`}
+  h+=`<div class="wk ${cur?'cur':''}"><div class="wk-h"><span class="t">${s==='DISP'?'Disponibilità':s}</span><span class="d">${fmtD(mon)} – ${fmtD(mon+6*864e5)}${cur?' · questa settimana':''}${isSummer(mon)||isSummer(mon+6*864e5)?' · estivo':''}${slots[s]&&slots[s].h?' · '+esc(slots[s].h):''}</span></div><div class="days">${days}</div></div>`}
+ document.getElementById('weeks').innerHTML=h;
+}
+document.getElementById('mPrev').onclick=()=>{mStart-=8*7*864e5;renderMine()};
+document.getElementById('mNext').onclick=()=>{mStart+=8*7*864e5;renderMine()};
+document.getElementById('mToday').onclick=()=>{mStart=mondayOf(todayT());renderMine();setTimeout(()=>{const c=document.querySelector('.wk.cur');c&&c.scrollIntoView({block:'center'})},20)};
+
+// ---------- rotazione deposito
+let gY,gM;{const n=new Date();gY=n.getFullYear();gM=n.getMonth()}
+const q=document.getElementById('q');
+function renderGrid(){
+ document.getElementById('gLbl').textContent=MONTHS[gM]+' '+gY;
+ const t0=todayT(),nd=new Date(Date.UTC(gY,gM+1,0)).getUTCDate();
+ let h='<thead><tr><th class="dcol">Data</th>'+DRIVERS.map((d,i)=>`<th class="${i===me?'me':''}" data-i="${i}">${esc(d.n)}<small>${d.m}</small></th>`).join('')+'</tr></thead><tbody>';
+ for(let d=1;d<=nd;d++){const t=utc(gY,gM,d),dw=dowOf(t),hol=holName(t);
+  const cls=hol?'hol':dw===6?'sun':dw===5?'sat':'';
+  h+=`<tr class="${t===t0?'row-today':''} ${dw===0&&d>1?'weekstart':''}" data-t="${t}"><td class="dcol ${cls}">${DAYS[dw]} ${d}${t===t0?'<span class="tag-today">OGGI</span>':''}${hol?'<span class="hol-tag" title="'+hol+'">FEST</span>':''}${isSummer(t)?'<span class="sum-tag" title="Calendario estivo'+(summerSure(t)?'':', date provvisorie')+'">EST'+(summerSure(t)?'':'?')+'</span>':''}</td>`;
+  for(let i=0;i<DRIVERS.length;i++){const c=cell(i,t);h+=`<td class="${isRest(c)||c==='DISP'?c:''} ${i===me?'me':''}" data-i="${i}">${c}</td>`}
+  h+='</tr>'}
+ document.getElementById('rot').innerHTML=h+'</tbody>';
+ applySearch();
+}
+function applySearch(){
+ const v=q.value.trim().toLowerCase();
+ document.querySelectorAll('#rot td:not(.dcol)').forEach(td=>{
+  const i=+td.dataset.i,d=DRIVERS[i];
+  const hit=v&&(td.textContent.toLowerCase().includes(v)||d.n.toLowerCase().includes(v)||d.m===v);
+  td.classList.toggle('hit',!!hit)})}
+q.oninput=applySearch;
+document.getElementById('gPrev').onclick=()=>{gM--;if(gM<0){gM=11;gY--}renderGrid()};
+document.getElementById('gNext').onclick=()=>{gM++;if(gM>11){gM=0;gY++}renderGrid()};
+function scrollToday(){const r=document.querySelector('#rot tr.row-today');const box=document.getElementById('gridbox');if(r)box.scrollTop=r.offsetTop-box.clientHeight/3}
+document.getElementById('gToday').onclick=()=>{const n=new Date();gY=n.getFullYear();gM=n.getMonth();renderGrid();setTimeout(scrollToday,20)};
+document.getElementById('gMine').onclick=()=>{const th=document.querySelector('#rot thead th.me');const box=document.getElementById('gridbox');const dc=document.querySelector('#rot thead th.dcol');if(th)box.scrollTo({left:th.offsetLeft-dc.offsetWidth-8,behavior:'smooth'})};
+
+// ---------- orari
+let saveTimer;
+function renderSet(){
+ document.getElementById('slotRows').innerHTML=ALL_CODES.map(c=>`<div class="srow"><span class="code">${c}</span><input id="h_${c}" data-c="${c}" data-k="h" placeholder="es. 05:20 - 12:55" value="${esc((slots[c]||{}).h||'')}"><input id="l_${c}" data-c="${c}" data-k="l" placeholder="es. Linea 286" value="${esc((slots[c]||{}).l||'')}"></div>`).join('');
+ document.getElementById('holOpt').checked=holOn;
+ const y0=new Date().getFullYear();
+ document.getElementById('sumOpt').checked=sumOn;
+ document.getElementById('sumList').innerHTML=[y0,y0+1,y0+2].map(y=>{const p=summerOf(y);
+  const tag=ok=>ok?'<span class="conf">confermata</span>':'<span class="prov">provvisoria</span>';
+  return `<div class="sumrow"><span class="y">${y}</span><span class="p">${art('dal',p.from)}${fmtMD(p.from)} ${tag(p.fromOk)} ${art('al',p.to)}${fmtMD(p.to)} ${tag(p.toOk)}</span></div>`}).join('');
+}
+document.getElementById('slotRows').addEventListener('input',e=>{const el=e.target;if(!el.dataset.c)return;
+ slots[el.dataset.c]=Object.assign({},slots[el.dataset.c],{[el.dataset.k]:el.value});store.set('slots',slots);
+ const m=document.getElementById('savedMsg');m.hidden=false;clearTimeout(saveTimer);saveTimer=setTimeout(()=>m.hidden=true,1500)});
+document.getElementById('holOpt').onchange=e=>{holOn=e.target.checked;store.set('holOn2',holOn)};
+document.getElementById('sumOpt').onchange=e=>{sumOn=e.target.checked;store.set('sumOn',sumOn)};
+
+
+renderHome();
+})();
+</script>
+
+</body>
+</html>
