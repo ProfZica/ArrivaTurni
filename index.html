@@ -288,7 +288,7 @@ table.rot{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular
 <script>
 (function(){
 const DRIVERS=[
- {n:'Aschieris',m:'945'},{n:'Conca Piero',m:'937'},{n:'Di Silvestro',m:'955'},{n:'Favretto',m:'968'},
+ {n:'Aschieris',m:'945'},{n:'Ricci',m:''},{n:'Di Silvestro',m:'955'},{n:'Favretto',m:'968'},
  {n:'Piazzolla',m:'1301'},{n:'Migliasso',m:'976'},{n:'Tescaro',m:'1039'},{n:'Blesic',m:'702000022'},
  {n:'Cassese',m:'984'},{n:'Favro',m:'1024'},{n:'Tomassone',m:'947'}];
 const CYCLE=['Su0090','Su0010','Su0080','Su0040','Su0060','Su0070','Su0110','Su5010','Su0100','Su0020','DISP'];
@@ -377,7 +377,7 @@ document.getElementById('themeBtn').onclick=()=>{const r=document.documentElemen
 
 // ---------- home
 const sel=document.getElementById('driverSel');
-sel.innerHTML=DRIVERS.map((d,i)=>`<option value="${i}">${esc(d.n)} ${d.m}</option>`).join('');
+sel.innerHTML=DRIVERS.map((d,i)=>`<option value="${i}">${esc(d.n)}${d.m?' '+d.m:''}</option>`).join('');
 sel.value=me;sel.onchange=()=>{me=+sel.value;store.set('me',me);renderHome()};
 function kindPill(c){return c==='RF'?'<span class="pill rest">RIPOSO FESTIVO</span>':c==='RIP'?'<span class="pill rest">RIPOSO</span>':c==='DISP'?'<span class="pill disp">DISPONIBILITÀ</span>':'<span class="pill work">IN SERVIZIO</span>'}
 function renderHome(){
